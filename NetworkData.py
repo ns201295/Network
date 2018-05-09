@@ -1,5 +1,5 @@
 import pandas as pd
-#define network
+
 class NetworkData:
     
     def __init__(self,nodesCSV,edgesCSV):        
