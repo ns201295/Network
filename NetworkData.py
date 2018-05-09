@@ -1,5 +1,5 @@
 import pandas as pd
-
+#define network
 class NetworkData:
     
     def __init__(self,nodesCSV,edgesCSV):        
@@ -12,7 +12,6 @@ class NetworkData:
         self.nodeID_label   = 'id'
         self.edgeFrom_label = 'from'
         self.edgeTo_label   = 'to'
-        
         
     def create(self):       
         self.nodesDF = self.nodesDF.set_index(self.nodeID_label)        
