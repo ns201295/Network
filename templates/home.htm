@@ -1,0 +1,204 @@
+<html>
+<head>
+  <title>Knowledge Net</title>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css"/>
+  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='style.css') }}">
+  </style>
+</head>
+<body>
+
+<form action="/" method="get">
+  <table>
+    <tr>
+      <td><input type="radio" name="operation" value="nodeView" checked></td>
+      <td>Node View:</td>
+      <td>
+        <select name="node">
+          <option disabled selected value> -- select a node -- </option>
+          {% for n in data['nodes'] %}
+  		      {% if data['selectedNode'] == n %}
+              <option value="{{n}}" selected>{{n}}</option>
+  		      {% else %}
+              <option value="{{n}}">{{n}}</option>
+  		      {% endif %}
+          {% endfor %}
+        </select>
+      </td>
+      <td>
+        <select name="degree">
+		      <option disabled selected value> -- choose degree -- </option>
+
+		      {% for i in range(1,7) %}
+            {% if i == data['selectedDegree'] %}
+				      <option value="{{i}}" selected>{{i}}</option>
+            {% else %}
+				      <option value="{{i}}">{{i}}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </td>
+    </tr>
+    <tr>
+      {% if data['selectedOperation'] == 'findPath' %}
+        <td><input type="radio" name="operation" value="findPath" checked></td>
+      {% else %}
+        <td><input type="radio" name="operation" value="findPath"></td>
+      {% endif %}
+      <td>Find Path:</td>
+      <td>
+        <select name="source">
+          <option disabled selected value> -- select a source -- </option>
+          {% for n in data['nodes'] %}
+            {% if data['selectedSource'] == n %}
+              <option value="{{n}}" selected>{{n}}</option>
+            {% else %}
+              <option value="{{n}}">{{n}}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </td>
+      <td>
+        <select name="target">
+          <option disabled selected value> -- select a target -- </option>
+          {% for n in data['nodes'] %}
+            {% if data['selectedTarget'] == n %}
+              <option value="{{n}}" selected>{{n}}</option>
+            {% else %}
+              <option value="{{n}}">{{n}}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </td>
+      <td>
+        <select name="hops">
+          <option disabled selected value> -- choose no. of hops -- </option>
+          <option value="-1"> Any ( Default )</option>
+          {% for i in range(1,11) %}
+            {% if i == data['selectedHops'] %}
+              <option value="{{i}}" selected>{{i}}</option>
+            {% else %}
+              <option value="{{i}}">{{i}}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </td>
+    </tr>
+  </table>
+  <input id="calculateButtonID" type="submit" value="Calculate">
+</form>
+
+<div id="network"></div>
+<script type="text/javascript">
+
+//Creates Vis js network 
+
+var nodes = new vis.DataSet(JSON.parse({{data['nodesJSON']|tojson}}));
+var edges = new vis.DataSet(JSON.parse({{data['edgesJSON']|tojson}}));
+
+var container = document.getElementById('network');
+var data = {
+    nodes: nodes,
+    edges: edges
+};
+
+options = {layout:{randomSeed:7}};
+var network = new vis.Network(container, data, options);
+
+
+// Graph Clustering
+var clusterIndex = 0;
+var clusters = [];
+var lastClusterZoomLevel = 0;
+var clusterFactor = 0.9;
+
+network.once('initRedraw', function() {
+    if (lastClusterZoomLevel === 0) {
+        lastClusterZoomLevel = network.getScale();
+    }
+});
+
+network.on('zoom', function (params) {
+    if (params.direction == '-') {
+        if (params.scale < lastClusterZoomLevel*clusterFactor) {
+            makeClusters(params.scale);
+            lastClusterZoomLevel = params.scale;
+        }
+    }
+    else {
+        openClusters(params.scale);
+    }
+});
+
+network.on("selectNode", function (params) {
+    if (params.nodes.length == 1) {
+        if (network.isCluster(params.nodes[0]) == true) {
+            network.openCluster(params.nodes[0])
+        }
+    }
+});
+
+
+function makeClusters(scale) {
+    var clusterOptionsByData = {
+        processProperties: function (clusterOptions, childNodes) {
+            clusterIndex = clusterIndex + 1;
+            var childrenCount = 0;
+            for (var i = 0; i < childNodes.length; i++) {
+                childrenCount += childNodes[i].childrenCount || 1;
+            }
+            clusterOptions.childrenCount = childrenCount;
+            clusterOptions.label = "# " + childrenCount + "";
+            clusterOptions.font = {size: childrenCount*5+30}
+            clusterOptions.id = 'cluster:' + clusterIndex;
+            clusters.push({id:'cluster:' + clusterIndex, scale:scale});
+            return clusterOptions;
+        },
+        clusterNodeProperties: {borderWidth: 3, shape: 'circle', font: {size: 10}}
+    }
+    network.clusterOutliers(clusterOptionsByData);
+        network.setOptions({physics:{stabilization:{fit: false}}});
+        network.stabilize();
+}
+
+function openClusters(scale) {
+    var newClusters = [];
+    var declustered = false;
+    for (var i = 0; i < clusters.length; i++) {
+        if (clusters[i].scale < scale) {
+            network.openCluster(clusters[i].id);
+            lastClusterZoomLevel = scale;
+            declustered = true;
+        }
+        else {
+            newClusters.push(clusters[i])
+        }
+    }
+    clusters = newClusters;
+    if (declustered === true) {
+        network.setOptions({physics:{stabilization:{fit: false}}});
+        network.stabilize();
+    }
+}
+
+// To be implemented
+network.on("click", function (params) {
+    console.log(params.nodes[0]);
+    arr = [];
+    for (var x in nodes._data){
+        arr.push(x)
+    }
+
+    if(arr.indexOf(params.nodes[0]) != -1 ){
+
+        a = network.getPositions(arr);
+        var coordinates = JSON.stringify(a);
+        console.log(coordinates)
+        var url = '/test?clickedNode='+params.nodes[0]+'&coordinates='+coordinates
+        window.location.href = url;
+    }
+});
+
+</script>
+</body>
+</html>

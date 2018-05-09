@@ -1,0 +1,20 @@
+#network {
+    width: window.width;
+    height: 550px;
+    margin-left: 10px;
+    margin-right: 10px;
+    border: 1px solid lightgray;
+}
+
+#calculateButtonID {
+    margin-left: 10px;
+    margin-top: 5px;
+}
+
+p {
+    max-width: 600px;
+}
+
+h4 {
+    margin-bottom: 3px;
+}

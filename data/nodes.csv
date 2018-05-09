@@ -1,0 +1,20 @@
+id,label,type,Alias,Description
+1,Python,Tag,"py,Python 3",Python is an interpreted high-level programming language for general-purpose programming.
+2,Machine Learning,Tag,"ML,Deep Learning","Machine learning is a field of computer science that gives computer systems the ability to ""learn"" with data, without being explicitly programmed."
+3,Trainer,Tag,"AI Trainer,Axtria Certified Trainer",
+4,Hive,Tag,,"Apache Hive is a data warehouse software project built on top of Apache Hadoop for providing data summarization, query and analysis."
+5,SQL,Tag,Server Query Language,"SQL is a domain-specific language used in programming and designed for managing data held in a relational database management system, or for stream processing in a relational data stream management system."
+6,Java,Tag,Java Programming,"Java is a general-purpose computer-programming language that is concurrent, class-based, object-oriented, and specifically designed to have as few implementation dependencies as possible"
+7,Salesforce,Tag,"SFDC,salesforce.com,force.com","The Salesforce Platform empowers developers to quickly build and deploy trusted cloud applications that are rock solid, secure, and scalable without worrying about hardware provisioning or application stacks."
+8,AWS,Tag,Amazon Web Services,"Amazon Web Services is a subsidiary of Amazon.com that provides on-demand cloud computing platforms to individuals, companies and governments, on a paid subscription basis."
+9,Google Cloud,Tag,GCP,"Google Cloud Platform, offered by Google, is a suite of cloud computing services that runs on the same infrastructure that Google uses internally for its end-user products, such as Google Search and YouTube"
+10,Azure,Tag,,"Microsoft Azure is a cloud computing service created by Microsoft for building, testing, deploying, and managing applications and services through a global network of Microsoft-managed data centers."
+11,Programming Language,Category,,Programming Language
+12,Training,Category,,Training
+13,Technology,Category,,Technology
+14,ETL,Category,,ETL
+15,Cloud,Category,,Cloud
+16,BOTS,Entity,Bussiness Operations and Technical Services,Bussiness Operations and Technical Services
+17,Axtria Institute,Entity,AI,
+18,Nitin Sharma,Entity,,Joined on july 2017
+19,BIM,Entity,Bussiness Intelligence,
